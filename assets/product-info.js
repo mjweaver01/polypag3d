@@ -27,6 +27,7 @@ if (!customElements.get('product-info')) {
 
         this.initQuantityHandlers();
         this.dispatchEvent(new CustomEvent('product-info:loaded', { bubbles: true }));
+        this.updateMediaGrouping();
       }
 
       addPreProcessCallback(callback) {
