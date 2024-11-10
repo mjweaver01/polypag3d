@@ -211,6 +211,8 @@ if (!customElements.get('product-info')) {
               variant,
             },
           });
+
+          this.updateMediaGrouping();
         };
       }
 
@@ -311,6 +313,40 @@ if (!customElements.get('product-info')) {
         const modalContent = this.productModal?.querySelector(`.product-media-modal__content`);
         const newModalContent = html.querySelector(`product-modal .product-media-modal__content`);
         if (modalContent && newModalContent) modalContent.innerHTML = newModalContent.innerHTML;
+      }
+
+      updateMediaGrouping() {
+        const mediaGalleries = this.querySelectorAll('media-gallery');
+        mediaGalleries.forEach(mediaGallery => {
+          const groupVariants = mediaGallery.getAttribute('data-group-variants');
+          const hasOnlyDefaultVariant = mediaGallery.getAttribute('data-has-only-default-variant');
+          const disableImageGrouping = mediaGallery.getAttribute('data-disable-image-grouping');
+      
+          if (groupVariants === 'false' || hasOnlyDefaultVariant === 'true' || disableImageGrouping === 'true') {
+            return;
+          }
+      
+          const mediaItems = mediaGallery.querySelectorAll('.product__media-item, .thumbnail-list__item');
+          const featuredMedia = Array.from(mediaItems).find(media => !media.classList.contains('hide-image'));
+          const featuredVariantGrouping = featuredMedia ? featuredMedia.getAttribute('data-variant-grouping') : null;
+      
+          mediaItems.forEach(mediaItem => {
+            const mediaVariantGrouping = mediaItem.getAttribute('data-variant-grouping');
+            if (mediaVariantGrouping === featuredVariantGrouping) {
+              mediaItem.classList.remove('hide-image');
+            } else {
+              mediaItem.classList.add('hide-image');
+            }
+          });
+      
+          const modalContent = this.productModal?.querySelector('.product-media-modal__content');
+          if (modalContent) {
+            modalContent.querySelectorAll('.product-modal-image').forEach(mediaItem => {
+              const mediaVariantGrouping = mediaItem.getAttribute('data-variant-grouping');
+              mediaItem.classList.toggle('hide-image', mediaVariantGrouping !== featuredVariantGrouping);
+            });
+          }
+        });
       }
 
       setQuantityBoundries() {
